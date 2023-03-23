@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: look at the event
         run: |
-          echo "this is a thing: ${{ github.event.pull_request }}"
+          echo "this is a thing: ${{ toJSON(github.event.pull_request) }}"
 
   build:
     name: Build
