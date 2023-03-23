@@ -37,6 +37,15 @@ jobs:
             echo "$file was changed"
           done
 
+      - name: Get at some git stuff
+        run: |
+          git log --oneline ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
+
+      - name: Get short sha
+        id: get_short_sha
+        run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        shell: bash
+
       - name: look at the event
         run: |
           echo "${{ github.event.commits[0].message }}"
