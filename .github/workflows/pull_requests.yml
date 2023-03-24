@@ -7,6 +7,31 @@ on:
 
 jobs:
 
+  does-kotlin-work:
+    name: DoesKotlinWork
+    runs-on: ubuntu-latest
+    steps:
+      - name: run some kotlin
+        shell: kotlinc -script {0}
+        run: |
+          val pattern = "^.*-- verify (.*?) --.*$".toRegex()
+          val allModulesValue = "all"
+
+          System
+            .`in`
+            .reader()
+            .useLines { lines ->
+                lines
+                    .mapNotNull { line -> pattern.matchEntire(line)?.groupValues }
+                    .map { (modules) -> modules.trim().split("\\s+".toRegex()) }
+                    .flatten()
+                    .toSet()
+                    .sorted()
+                    .takeUnless { it.contains(allModulesValue) }
+                    ?: listOf(allModulesValue)
+            }
+            .forEach(::println)
+
   event-stuff:
     name: EventStuff
     runs-on: ubuntu-latest
