@@ -14,23 +14,31 @@ jobs:
       - name: run some kotlin
         shell: kotlin -howtorun .main.kts {0}
         run: |
+          @file:DependsOn("com.lordcodes.turtle:turtle:0.6.0")
+          import com.lordcodes.turtle.shellRun
+
           val pattern = "^.*-- verify (.*?) --.*$".toRegex()
           val allModulesValue = "all"
 
-          System
-            .`in`
-            .reader()
-            .useLines { lines ->
-                lines
-                    .mapNotNull { line -> pattern.matchEntire(line)?.groupValues }
-                    .map { (modules) -> modules.trim().split("\\s+".toRegex()) }
-                    .flatten()
-                    .toSet()
-                    .sorted()
-                    .takeUnless { it.contains(allModulesValue) }
-                    ?: listOf(allModulesValue)
-            }
-            .forEach(::println)
+          val gitLogOutput = shellRun(
+              "git",
+              listOf("log", "--pretty=fuller", "${{ github.event.pull_request.base.sha }}", "..", "${{ github.event.pull_request.head.sha }}")
+          )
+
+          val modules = gitLogOutput
+              .lineSequence()
+              .mapNotNull { line -> pattern.matchEntire(line)?.groupValues }
+              .map { (_, modules) -> modules.trim().split("\\s+".toRegex()) }
+              .flatten()
+              .toSet()
+              .sorted()
+              .toList()
+              .takeUnless { it.contains(allModulesValue) }
+              ?: listOf(allModulesValue)
+
+          for (moduleName in modules) {
+              println(moduleName)
+          }
 
   event-stuff:
     name: EventStuff
