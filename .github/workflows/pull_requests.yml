@@ -52,7 +52,10 @@ jobs:
 
           val gitLogOutput = shellRun(
               "git",
-              listOf("log", "--pretty=fuller", "${{ github.event.pull_request.base.sha }}", "..", "${{ github.event.pull_request.head.sha }}")
+              listOf(
+                  "log", 
+                  "--pretty=fuller", 
+                  "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}")
           )
 
           val modules = gitLogOutput
