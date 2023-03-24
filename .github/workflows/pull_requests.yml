@@ -42,36 +42,31 @@ jobs:
           git log --oneline ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
 
       - name: run some kotlin
-        shell: kotlin -howtorun .main.kts {0}
+        shell: python
         run: |
-          @file:DependsOn("com.lordcodes.turtle:turtle:0.6.0")
-          import com.lordcodes.turtle.shellRun
+          import subprocess
+          import re
 
-          val pattern = "^.*-- verify (.*?) --.*$".toRegex()
-          val allModulesValue = "all"
+          pattern = re.compile("^.*-- verify (.*?) --.*$")
+          all_modules_value = "all"
 
-          val gitLogOutput = shellRun(
-              "git",
-              listOf(
-                  "log", 
-                  "--pretty=fuller", 
-                  "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}")
-          )
+          git_log_output = subprocess.run(
+              ["git", "log", "--pretty=fuller", "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"],
+              capture_output=True,
+              text=True
+          ).stdout
 
-          val modules = gitLogOutput
-              .lineSequence()
-              .mapNotNull { line -> pattern.matchEntire(line)?.groupValues }
-              .map { (_, modules) -> modules.trim().split("\\s+".toRegex()) }
-              .flatten()
-              .toSet()
-              .sorted()
-              .toList()
-              .takeUnless { it.contains(allModulesValue) }
-              ?: listOf(allModulesValue)
+          modules = sorted(set(
+              module
+              for line in git_log_output.splitlines()
+              if (module := pattern.match(line))
+          ))
 
-          for (moduleName in modules) {
-              println(moduleName)
-          }
+          if all_modules_value not in modules:
+              modules.append(all_modules_value)
+
+          for module_name in modules:
+              print(module_name)
 
       - name: Get short sha
         id: get_short_sha
