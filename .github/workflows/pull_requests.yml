@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: run some kotlin
-        shell: /usr/bin/env kotlin
+        shell: /usr/bin/env kotlin {0}
         run: |
           val pattern = "^.*-- verify (.*?) --.*$".toRegex()
           val allModulesValue = "all"
