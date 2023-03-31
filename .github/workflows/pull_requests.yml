@@ -51,4 +51,4 @@ jobs:
           echo "${{ github.event.commits[0].message }}"
 
       - name: Check the things
-        run: true
+        run: sleep 30; true
