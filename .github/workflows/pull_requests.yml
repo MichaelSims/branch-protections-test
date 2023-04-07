@@ -7,13 +7,13 @@ on:
 
 jobs:
 
-  print-github-event:
-    name: Print GitHub pull request event
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print the event
-        run: |
-          echo "${{ toJSON(github.event.pull_request) }}"
+#  print-github-event:
+#    name: Print GitHub pull request event
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Print the event
+#        run: |
+#          echo "${{ toJSON(github.event.pull_request) }}"
 
   build:
     name: Build
