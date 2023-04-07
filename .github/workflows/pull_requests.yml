@@ -41,5 +41,5 @@ jobs:
       - name: Check the things
         run: |
           chmod a+x verify.sh
-          sleep 60
+          sleep 10
           ./verify.sh
