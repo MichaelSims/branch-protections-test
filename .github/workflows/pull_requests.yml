@@ -7,29 +7,26 @@ on:
 
 jobs:
 
-  event-stuff:
-    name: EventStuff
+  print-github-event:
+    name: Print GitHub pull request event
     runs-on: ubuntu-latest
     steps:
-      - name: look at the event
+      - name: Print the event
         run: |
-          echo "this is a thing: ${{ toJSON(github.event.pull_request) }}"
+          echo "${{ toJSON(github.event.pull_request) }}"
 
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        name: Checkout repo
         with:
           fetch-depth: 0
-      # Example 1
+
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v35
-
-        # To compare changes between the current commit and the last pushed remote commit set `since_last_remote_commit: true`. e.g
-        # with:
-        #   since_last_remote_commit: true 
 
       - name: List all changed files
         run: |
@@ -37,7 +34,7 @@ jobs:
             echo "$file was changed"
           done
 
-      - name: Get at some git stuff
+      - name: Log commits in this PR
         run: |
           git log --oneline ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
 
@@ -46,9 +43,7 @@ jobs:
         run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
         shell: bash
 
-      - name: look at the event
-        run: |
-          echo "${{ github.event.commits[0].message }}"
-
       - name: Check the things
-        run: sleep 30; true
+        run: |
+          chmod a+x verify.sh
+          ./verify.sh
